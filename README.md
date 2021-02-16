@@ -15,12 +15,15 @@
     <img src="assets/logo.png" alt="Logo" width="256" height="265">
   </a>
 
-  <h3 align="center">Marauder</h3>
+  <h3 align="center">vimwiki-to-web</h3>
 
   <p align="center">
-    A tool for documenting CLI operations. 
+    Publish your vimwiki go Gemini!
     <br />
-    <quote>I solemnly swear I am up to no good.</quote>
+    <blockquote>
+        <p>Write what you know. That should leave you with a lot of free time.</p>
+        <footer>Howard Nemerov</footer> 
+    </blockquote>
     <br />
     <a href="https://github.com/alexanderbrevig/vimwiki-to-web"><strong>Explore the docs »</strong></a>
     <br />
@@ -29,35 +32,6 @@
     <a href="https://github.com/alexanderbrevig/vimwiki-to-web/issues">Report Features & Bug</a>
   </p>
 </p>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
-  </ol>
-</details>
-
 
 
 <!-- ABOUT THE PROJECT -->
@@ -83,7 +57,7 @@ To get a local copy up and running follow these simple steps.
 
 * golang
 
-### Installation
+### Installation and Use
 
 1. Clone the repo
    ```sh
@@ -96,22 +70,22 @@ To get a local copy up and running follow these simple steps.
    ```
 3. Install if you want
    ```sh
-   GOBIN=/usr/local/bin/ go install ./cmd/vimwiki-to-web
+   GOBIN=/usr/local/bin/ go install ./cmd/vwtw
    ```
 
 <!-- USAGE EXAMPLES -->
-## Usage
+#### Usage
 
    ```
-    -file string
-        Path to your file (default "/index.md")
-    -gmiout string
-        Path to your output folder (default "/home/alexander/vimwiki-gemini")
-    -vimwiki string
-        Path to your vimwiki (default "/home/alexander/vimwiki")
+   > vwtw -h[elp]
+   Usage of vwtw:
+        -file string
+            Path to your file (default "/index.md")
+        -gmiout string
+            Path to your output folder (default "/home/$(whoami)/vimwiki-gemini")
+        -vimwiki string
+            Path to your vimwiki (default "/home/$(whoami)/vimwiki")
    ```
-
-You will now have a file called `$DATE ls -la.txt` with the output of ls, and a `$DATE ls -la.png` with a simulated screenshot of the terminal.
 
 
 <!-- ROADMAP -->
