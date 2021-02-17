@@ -22,7 +22,7 @@
     <br />
     <blockquote>
         <p>Write what you know. That should leave you with a lot of free time.</p>
-        <footer>Howard Nemerov</footer> 
+        <footer>&emdash; Howard Nemerov</footer> 
     </blockquote>
     <br />
     <a href="https://github.com/alexanderbrevig/vimwiki-to-web"><strong>Explore the docs »</strong></a>
