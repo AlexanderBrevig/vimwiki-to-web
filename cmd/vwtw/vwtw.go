@@ -39,7 +39,6 @@ func renderToFile(path string) {
 	gmirend := gemini.NewRenderer(
 		gemini.RendererOptions{
 			VimWikiRoot: vimwikiPath,
-			Debug:       true,
 		},
 	)
 	gmi := vwtw.ToGEMINI([]byte(mdcontent), nil, gmirend)

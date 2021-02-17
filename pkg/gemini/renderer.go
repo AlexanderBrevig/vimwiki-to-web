@@ -139,8 +139,6 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 					fmt.Println("Got include", string(node.Literal))
 				}
 				files, err := filepath.Glob(filepath.Join(r.opts.VimWikiRoot, string(node.Literal)))
-				fmt.Printf("%v\n", r.opts)
-				fmt.Printf("%v\n", files)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -176,9 +174,8 @@ func (r *Renderer) RenderHeader(w io.Writer, ast ast.Node) {
 		if err != nil {
 			panic(err)
 		}
-		w.Write([]byte("```\n"))
 		w.Write(banner)
-		w.Write([]byte("\n```\n"))
+		w.Write([]byte("\n"))
 	}
 }
 func (r *Renderer) RenderFooter(w io.Writer, ast ast.Node) {
