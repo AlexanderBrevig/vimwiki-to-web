@@ -14,6 +14,7 @@ import (
 type RendererOptions struct {
 	VimWikiRoot string
 	Debug       bool
+	debugLevel  int
 }
 
 type Renderer struct {
@@ -26,15 +27,32 @@ func NewRenderer(opts RendererOptions) *Renderer {
 	}
 }
 
-func (r *Renderer) debugNode(node ast.Node) {
+func (r *Renderer) debugNode(node ast.Node, entering bool) {
 	if r.opts.Debug {
+		_, isText := node.(*ast.Text)
+		if !isText {
+			if entering {
+				r.opts.debugLevel++
+			}
+		} else {
+			r.opts.debugLevel++
+		}
 		cont := node.AsContainer()
-		if cont != nil && len(cont.Literal) > 0 {
-			fmt.Printf("%T\t%s\n", node, cont.Literal)
+		if cont != nil /*&& len(cont.Literal) > 0 */ {
+			fmt.Print(strings.Repeat("\t", r.opts.debugLevel))
+			fmt.Printf("%s %T\t%s\n", entering, node, cont.Literal)
 		}
 		leaf := node.AsLeaf()
-		if leaf != nil && len(leaf.Literal) > 0 {
-			fmt.Printf("%T\t%s\n", node, leaf.Literal)
+		if leaf != nil /*&& len(leaf.Literal) > 0 */ {
+			fmt.Print(strings.Repeat("\t", r.opts.debugLevel))
+			fmt.Printf("%s %T\t%s\n", entering, node, leaf.Literal)
+		}
+		if !isText {
+			if !entering {
+				r.opts.debugLevel--
+			}
+		} else {
+			r.opts.debugLevel--
 		}
 	}
 }
@@ -42,7 +60,7 @@ func (r *Renderer) debugNode(node ast.Node) {
 func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.WalkStatus {
 	switch node := node.(type) {
 	case *ast.Heading:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			level := node.Level
 			if level > 3 {
@@ -55,24 +73,24 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 			w.Write([]byte("\n\n"))
 		}
 	case *ast.List:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if !entering {
 			w.Write([]byte("\n"))
 		}
 	case *ast.Paragraph:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if !entering {
 			w.Write([]byte("\n\n"))
 		}
 	case *ast.CodeBlock:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			w.Write([]byte("\n```\n"))
 			w.Write(node.Literal)
 			w.Write([]byte("\n```\n\n"))
 		}
 	case *ast.Code:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			w.Write([]byte("`"))
 			w.Write(node.Literal)
@@ -80,14 +98,14 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 		}
 
 	case *ast.BlockQuote:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			w.Write([]byte("> "))
 		} else {
 			w.Write([]byte("\n"))
 		}
 	case *ast.Link:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			w.Write([]byte("=> "))
 			destination := string(node.Destination)
@@ -96,26 +114,33 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 			w.Write([]byte(" "))
 		}
 	case *ast.Image:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			w.Write([]byte("=> "))
 			w.Write(node.Destination)
 			w.Write([]byte(" "))
 		}
 	case *ast.Text:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 		if entering {
 			_, isLink := node.Parent.(*ast.Link)
 			_, isList := node.Parent.GetParent().(*ast.ListItem)
 			_, isInclude := node.Parent.(*ast.Del)
 			if !isLink && isList && len(node.Literal) > 0 {
-				// Handle output of wikitasks
-				if !strings.Contains(string(node.Literal), "[ ]") {
+				literal := string(node.Literal)
+				literal = strings.Replace(literal, "[ ]", "", -1)
+				literal = strings.Replace(literal, "<<", "", -1)
+				if !strings.Contains(string(node.Literal), "<<") {
 					w.Write([]byte("* "))
 				}
-				w.Write([]byte(node.Literal))
+				w.Write([]byte(literal))
 			} else if isInclude {
-				files, err := filepath.Glob(r.opts.VimWikiRoot + string(node.Literal))
+				if r.opts.Debug {
+					fmt.Println("Got include", string(node.Literal))
+				}
+				files, err := filepath.Glob(filepath.Join(r.opts.VimWikiRoot, string(node.Literal)))
+				fmt.Printf("%v\n", r.opts)
+				fmt.Printf("%v\n", files)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -131,13 +156,13 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 			}
 		}
 	case *ast.Del:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 	case *ast.ListItem:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 	case *ast.Emph:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 	case *ast.Document:
-		r.debugNode(node)
+		r.debugNode(node, entering)
 	default:
 		panic(fmt.Sprintf("%T is not supported for Gemini.gmi files", node))
 	}
